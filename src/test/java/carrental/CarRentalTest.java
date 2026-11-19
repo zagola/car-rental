@@ -53,4 +53,19 @@ class CarRentalTest {
 
         assertDoesNotThrow(() -> carRental.reserve(CarType.SUV, MONDAY_10_00.plusDays(5), 2));
     }
+
+    @Test
+    void carReturnedAtTheExactMomentCanBeRentedAgain() {
+        Reservation first = carRental.reserve(CarType.SUV, MONDAY_10_00, 2);
+
+        assertDoesNotThrow(() -> carRental.reserve(CarType.SUV, first.endDateTime(), 1));
+    }
+
+    @Test
+    void reservationStartingBeforeAnotherEndsIsRejected() {
+        Reservation first = carRental.reserve(CarType.SUV, MONDAY_10_00, 2);
+
+        assertThrows(CarNotAvailableException.class,
+                () -> carRental.reserve(CarType.SUV, first.endDateTime().minusMinutes(1), 1));
+    }
 }

@@ -2,6 +2,7 @@ package carrental;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,5 +37,13 @@ class CarRentalTest {
 
         assertThrows(CarNotAvailableException.class,
                 () -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, 2));
+    }
+
+    @Test
+    void typesAreIndependentOfEachOther() {
+        carRental.reserve(CarType.SUV, MONDAY_10_00, 2);
+
+        assertDoesNotThrow(() -> carRental.reserve(CarType.VAN, MONDAY_10_00, 2));
+        assertDoesNotThrow(() -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, 2));
     }
 }

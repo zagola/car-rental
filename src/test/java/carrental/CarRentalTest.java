@@ -3,6 +3,8 @@ package carrental;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -78,5 +80,22 @@ class CarRentalTest {
             assertThrows(CarNotAvailableException.class,
                     () -> carRental.reserve(CarType.VAN, MONDAY_10_00.plusDays(dayOffset), 1));
         }
+    }
+
+    @Test
+    void allowsRequestOverlappingTwoConsecutiveReservations() {
+        carRental.reserve(CarType.SEDAN, MONDAY_10_00, 2);
+        carRental.reserve(CarType.SEDAN, MONDAY_10_00.plusDays(2), 2);
+
+        assertTrue(carRental.isAvailable(CarType.SEDAN, MONDAY_10_00.plusDays(1), 2));
+    }
+
+    @Test
+    void rejectsRequestWhenAllCarsAreInUseAtSomeMoment() {
+        carRental.reserve(CarType.SEDAN, MONDAY_10_00, 2);
+        carRental.reserve(CarType.SEDAN, MONDAY_10_00.plusDays(1), 3);
+
+        assertFalse(carRental.isAvailable(CarType.SEDAN, MONDAY_10_00.plusDays(1), 1));
+        assertFalse(carRental.isAvailable(CarType.SEDAN, MONDAY_10_00, 4));
     }
 }

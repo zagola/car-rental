@@ -12,34 +12,36 @@ public class CarRental {
     private final List<Reservation> reservations = new ArrayList<>();
 
     public CarRental(Map<CarType, Integer> carsPerType) {
-        for (CarType type : CarType.values()) {
-            int numberOfCars = carsPerType.getOrDefault(type, 0);
+        for (CarType carType : CarType.values()) {
+            int numberOfCars = carsPerType.getOrDefault(carType, 0);
             if (numberOfCars < 0) {
-                throw new IllegalArgumentException("Number of cars cannot be negative: " + type);
+                throw new IllegalArgumentException("Number of cars cannot be negative: " + carType);
             }
-            capacityByType.put(type, numberOfCars);
+            capacityByType.put(carType, numberOfCars);
         }
     }
 
-    public synchronized Reservation reserve(CarType type, LocalDateTime start, int days) {
-        Reservation requestedReservation = new Reservation(type, start, days);
+    public synchronized Reservation reserve(CarType carType, LocalDateTime startDateTime, int numberOfDays) {
+        Reservation requestedReservation = new Reservation(carType, startDateTime, numberOfDays);
         if (!hasFreeCarForWholePeriod(requestedReservation)) {
             throw new CarNotAvailableException(
-                    "No " + type + " available from " + requestedReservation.startDateTime() + " to " + requestedReservation.endDateTime());
+                    "No " + carType + " available from " + requestedReservation.startDateTime() + " to " +
+                            requestedReservation.endDateTime());
         }
         reservations.add(requestedReservation);
         return requestedReservation;
     }
 
-    public synchronized boolean isAvailable(CarType type, LocalDateTime start, int days) {
-        return hasFreeCarForWholePeriod(new Reservation(type, start, days));
+    public synchronized boolean isAvailable(CarType carType, LocalDateTime startDateTime, int numberOfDays) {
+        return hasFreeCarForWholePeriod(new Reservation(carType, startDateTime, numberOfDays));
     }
 
     private boolean hasFreeCarForWholePeriod(Reservation requestedReservation) {
         int numberOfCarsOfType = capacityByType.get(requestedReservation.carType());
         List<Reservation> overlappingReservationsOfSameType = reservations.stream()
                 .filter(r -> r.carType() == requestedReservation.carType())
-                .filter(r -> r.overlaps(requestedReservation.startDateTime(), requestedReservation.endDateTime()))
+                .filter(r -> r.overlaps(requestedReservation.startDateTime(),
+                        requestedReservation.endDateTime()))
                 .toList();
 
         List<LocalDateTime> momentsToCheck = new ArrayList<>();
@@ -51,7 +53,8 @@ public class CarRental {
         }
 
         for (LocalDateTime moment : momentsToCheck) {
-            long carsInUse = overlappingReservationsOfSameType.stream().filter(r -> r.isInUseAt(moment)).count();
+            long carsInUse = overlappingReservationsOfSameType.stream().filter(r ->
+                    r.isInUseAt(moment)).count();
             if (carsInUse + 1 > numberOfCarsOfType) {
                 return false;
             }

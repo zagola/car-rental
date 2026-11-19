@@ -98,4 +98,13 @@ class CarRentalTest {
         assertFalse(carRental.isAvailable(CarType.SEDAN, MONDAY_10_00.plusDays(1), 1));
         assertFalse(carRental.isAvailable(CarType.SEDAN, MONDAY_10_00, 4));
     }
+
+    @Test
+    void rejectedReservationIsNotSaved() {
+        carRental.reserve(CarType.SUV, MONDAY_10_00, 2);
+        assertThrows(CarNotAvailableException.class,
+                () -> carRental.reserve(CarType.SUV, MONDAY_10_00.plusDays(1), 3));
+
+        assertTrue(carRental.isAvailable(CarType.SUV, MONDAY_10_00.plusDays(3), 1));
+    }
 }

@@ -115,4 +115,12 @@ class CarRentalTest {
         assertThrows(IllegalArgumentException.class,
                 () -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, -2));
     }
+
+    @Test
+    void rejectsMissingTypeOrStart() {
+        assertThrows(IllegalArgumentException.class,
+                () -> carRental.reserve(null, MONDAY_10_00, 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> carRental.reserve(CarType.SEDAN, null, 1));
+    }
 }

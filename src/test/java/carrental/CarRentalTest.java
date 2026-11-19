@@ -131,4 +131,10 @@ class CarRentalTest {
         assertThrows(CarNotAvailableException.class,
                 () -> onlySedans.reserve(CarType.VAN, MONDAY_10_00, 1));
     }
+
+    @Test
+    void rejectsNegativeNumberOfCars() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new CarRental(Map.of(CarType.SEDAN, -1)));
+    }
 }

@@ -107,4 +107,12 @@ class CarRentalTest {
 
         assertTrue(carRental.isAvailable(CarType.SUV, MONDAY_10_00.plusDays(3), 1));
     }
+
+    @Test
+    void rejectsNumberOfDaysBelowOne() {
+        assertThrows(IllegalArgumentException.class,
+                () -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, -2));
+    }
 }

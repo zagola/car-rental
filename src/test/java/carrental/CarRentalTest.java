@@ -68,4 +68,15 @@ class CarRentalTest {
         assertThrows(CarNotAvailableException.class,
                 () -> carRental.reserve(CarType.SUV, first.endDateTime().minusMinutes(1), 1));
     }
+
+    @Test
+    void multiDayReservationBlocksTheCarForEveryDay() {
+        carRental.reserve(CarType.VAN, MONDAY_10_00, 5);
+
+        for (int day = 0; day < 5; day++) {
+            int dayOffset = day;
+            assertThrows(CarNotAvailableException.class,
+                    () -> carRental.reserve(CarType.VAN, MONDAY_10_00.plusDays(dayOffset), 1));
+        }
+    }
 }

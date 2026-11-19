@@ -123,4 +123,12 @@ class CarRentalTest {
         assertThrows(IllegalArgumentException.class,
                 () -> carRental.reserve(CarType.SEDAN, null, 1));
     }
+
+    @Test
+    void typeWithoutAnyCarsCannotBeReserved() {
+        CarRental onlySedans = new CarRental(Map.of(CarType.SEDAN, 1));
+
+        assertThrows(CarNotAvailableException.class,
+                () -> onlySedans.reserve(CarType.VAN, MONDAY_10_00, 1));
+    }
 }

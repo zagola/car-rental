@@ -46,4 +46,11 @@ class CarRentalTest {
         assertDoesNotThrow(() -> carRental.reserve(CarType.VAN, MONDAY_10_00, 2));
         assertDoesNotThrow(() -> carRental.reserve(CarType.SEDAN, MONDAY_10_00, 2));
     }
+
+    @Test
+    void carIsFreeAgainWhenEarlierReservationHasEnded() {
+        carRental.reserve(CarType.SUV, MONDAY_10_00, 2);
+
+        assertDoesNotThrow(() -> carRental.reserve(CarType.SUV, MONDAY_10_00.plusDays(5), 2));
+    }
 }

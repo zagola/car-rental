@@ -2,13 +2,13 @@ package carrental;
 
 import java.time.LocalDateTime;
 
-public record Reservation(CarType type, LocalDateTime start, int numberOfDays) {
+public record Reservation(CarType carType, LocalDateTime startDateTime, int numberOfDays) {
 
     public Reservation {
-        if (type == null) {
-            throw new IllegalArgumentException("Car type is required");
+        if (carType == null) {
+            throw new IllegalArgumentException("Car carType is required");
         }
-        if (start == null) {
+        if (startDateTime == null) {
             throw new IllegalArgumentException("Start date and time is required");
         }
         if (numberOfDays < 1) {
@@ -16,16 +16,15 @@ public record Reservation(CarType type, LocalDateTime start, int numberOfDays) {
         }
     }
 
-    public LocalDateTime end() {
-        return start.plusDays(numberOfDays);
+    public LocalDateTime endDateTime() {
+        return startDateTime.plusDays(numberOfDays);
     }
 
     public boolean overlaps(LocalDateTime periodStart, LocalDateTime periodEnd) {
-        return start.isBefore(periodEnd) && periodStart.isBefore(end());
+        return startDateTime.isBefore(periodEnd) && periodStart.isBefore(endDateTime());
     }
 
-    public boolean isActiveAt(LocalDateTime moment) {
-        return !moment.isBefore(start) && moment.isBefore(end());
+    public boolean isInUseAt(LocalDateTime moment) {
+        return !moment.isBefore(startDateTime) && moment.isBefore(endDateTime());
     }
-
 }

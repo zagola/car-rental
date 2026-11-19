@@ -25,7 +25,7 @@ public class CarRental {
         Reservation requestedReservation = new Reservation(type, start, days);
         if (!hasFreeCarForWholePeriod(requestedReservation)) {
             throw new CarNotAvailableException(
-                    "No " + type + " available from " + requestedReservation.start() + " to " + requestedReservation.end());
+                    "No " + type + " available from " + requestedReservation.startDateTime() + " to " + requestedReservation.endDateTime());
         }
         reservations.add(requestedReservation);
         return requestedReservation;
@@ -36,22 +36,22 @@ public class CarRental {
     }
 
     private boolean hasFreeCarForWholePeriod(Reservation requestedReservation) {
-        int numberOfCarsOfType = capacityByType.get(requestedReservation.type());
+        int numberOfCarsOfType = capacityByType.get(requestedReservation.carType());
         List<Reservation> overlappingReservationsOfSameType = reservations.stream()
-                .filter(r -> r.type() == requestedReservation.type())
-                .filter(r -> r.overlaps(requestedReservation.start(), requestedReservation.end()))
+                .filter(r -> r.carType() == requestedReservation.carType())
+                .filter(r -> r.overlaps(requestedReservation.startDateTime(), requestedReservation.endDateTime()))
                 .toList();
 
         List<LocalDateTime> momentsToCheck = new ArrayList<>();
-        momentsToCheck.add(requestedReservation.start());
+        momentsToCheck.add(requestedReservation.startDateTime());
         for (Reservation existingReservation : overlappingReservationsOfSameType) {
-            if (existingReservation.start().isAfter(requestedReservation.start())) {
-                momentsToCheck.add(existingReservation.start());
+            if (existingReservation.startDateTime().isAfter(requestedReservation.startDateTime())) {
+                momentsToCheck.add(existingReservation.startDateTime());
             }
         }
 
         for (LocalDateTime moment : momentsToCheck) {
-            long carsInUse = overlappingReservationsOfSameType.stream().filter(r -> r.isActiveAt(moment)).count();
+            long carsInUse = overlappingReservationsOfSameType.stream().filter(r -> r.isInUseAt(moment)).count();
             if (carsInUse + 1 > numberOfCarsOfType) {
                 return false;
             }
